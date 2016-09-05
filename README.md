@@ -1,1 +1,2 @@
-# qlik-sense-highcharts-area-line
+Qlik-Sense-HighchartJS-Pie-Chart-Extension
+==========================================

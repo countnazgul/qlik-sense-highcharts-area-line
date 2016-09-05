@@ -1,0 +1,9 @@
+{
+	"name" : "Highcharts Range Area",
+	"description" : "HighchartsJS Multiple Range Areas and Line",
+	"icon" : "line-chart",
+	"type" : "visualization",
+	"version": "1.0",
+	"preview" : "line",
+	"author": "stefan.stoichev@gmail.com"
+}
