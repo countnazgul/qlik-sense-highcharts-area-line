@@ -5,7 +5,10 @@ requirejs.config({
 		},
       	"extensions/com-highcharts-reangearea/highcharts-more" : {
               "deps" : ["./highcharts"] 
-	}
+		},
+		"extensions/com-highcharts-reangearea/moment" : {
+			"deps" : []
+		}		
 	}
 });
 
@@ -13,8 +16,9 @@ requirejs.config({
 
 
 
-define(["jquery","./highcharts", "./highcharts-more","text!./simpletable.css"], function($,Highcharts , cssContent) {'use strict';
-	$("<style>").html(cssContent).appendTo("head");
+define(["jquery","./highcharts", "./moment", "./highcharts-more"], function($, Highcharts, moment) {
+	'use strict';
+	//$("<style>").html(cssContent).appendTo("head");
 	return {
 		initialProperties : {
 			version: 1.0,
@@ -23,7 +27,7 @@ define(["jquery","./highcharts", "./highcharts-more","text!./simpletable.css"], 
 				qMeasures : [],
 				qInitialDataFetch : [{
 					qWidth : 10,
-					qHeight : 50
+					qHeight : 500
 				}]
 			}
 		},
@@ -53,36 +57,108 @@ define(["jquery","./highcharts", "./highcharts-more","text!./simpletable.css"], 
 						},
 						Pivot: {
 							type: "items",
-							label: "Pie Chart Options" ,
+							label: "Highcharts Options" ,
 							items: {
-						Title : {
-							ref: "PieTitle",
-							label: "Title",
-							type: "string",
-							defaultValue: "Pie Chart",
-						},								
-						Size : {
-							ref: "PieSize",
-							label: "Size",
-							type: "integer",
-							defaultValue: 100,
-							component: "slider",
-							min: 1,
-							max: 100,
-							step: 1
-						},	
-						InnerSize : {
-							ref: "PieInnerSize",
-							label: "Inner Size",
-							type: "integer",
-							defaultValue: 60,
-							component: "slider",
-							min: 1,
-							max: 100,
-							step: 1
-						}							
-}
-}						
+							  Title : {
+								  ref: "ChartTitle",
+								  label: "Title",
+								  type: "string",
+								  defaultValue: "",
+							  },								
+							  Size : {
+								  ref: "PieSize",
+								  label: "Size",
+								  type: "integer",
+								  defaultValue: 100,
+								  component: "slider",
+								  min: 1,
+								  max: 100,
+								  step: 1
+							  },	
+							  InnerSize : {
+								  ref: "PieInnerSize",
+								  label: "Inner Size",
+								  type: "integer",
+								  defaultValue: 60,
+								  component: "slider",
+								  min: 1,
+								  max: 100,
+								  step: 1
+							  }							
+							}
+						},
+						Legend: {
+							type: "items",
+							label: "Legend",
+							items: {
+								ShowLegend: {
+									ref: "legend.show",
+									type: "boolean",
+									label: "Show legend",
+									defaultValue: true
+								},
+								PositionLegend: {
+									ref: "legend.position",
+									type: "string",
+									component: "dropdown",
+									label: "Horizontal osition",
+									options: [{
+										value: "left",
+										label: "Left"
+									},{
+										value: "center",
+										label: "Center"
+									},{
+										value: "right",
+										label: "Right"
+									}],
+									defaultValue: "right"
+								},
+								PositionLegendVertical: {
+									ref: "legend.positionVertical",
+									type: "string",
+									component: "dropdown",
+									label: "Vertical Position",
+									options: [{
+										value: "top",
+										label: "Top"
+									},{
+										value: "middle",
+										label: "Middle"
+									},{
+										value: "bottom",
+										label: "Bottom"
+									}],
+									defaultValue: "top"
+								},
+								LegendLayout: {
+									ref: "legend.layout",
+									type: "string",
+									component: "dropdown",
+									label: "Layout",
+									options: [{
+										value: "horizontal",
+										label: "Horizontal"
+									},{
+										value: "vertical",
+										label: "Vertical"
+									}],
+									defaultValue: "vertical"
+								},
+								LegendFloating: {
+									ref: "legend.floating",
+									type: "boolean",
+									label: "Floating",
+									defaultValue: true
+								},					
+								MyStringProp: {
+									ref: "legend.title",
+									label: "Title",
+									type: "string",
+									defaultValue: ""
+								}							
+							}
+						}
 					}
 				}
 			}
@@ -91,38 +167,7 @@ define(["jquery","./highcharts", "./highcharts-more","text!./simpletable.css"], 
 			canTakeSnapshot : true
 		},
 		paint : function($element,layout) {
-		
-		
-    var ranges = [
 
-            [1246752000000, 16.5, 25.0],
-            [1246838400000, 17.8, 25.7],
-            [1246924800000, 13.5, 24.8],
-            [1247011200000, 10.5, 21.4]
-        ],
-    ranges1 = [
-            [1246406400000, 24.3, 17.7],           
-            [1246492800000, 24.5, 17.8],
-            [1246579200000, 25.5, 19.6],
-            [1246665600000, 26.7, 20.7],
-            [1246752000000, 26.5, 15.0],
-            [1246838400000, 27.8, 15.7],
-            [1246924800000, 23.5, 14.8],
-            [1247011200000, 20.5, 11.4]
-        ],        
-        averages = [
-            [1246406400000, 21.5],
-            [1246492800000, 22.1],
-            [1246579200000, 23],
-            [1246665600000, 23.8],
-            [1246752000000, 21.4],
-            [1246838400000, 21.3],
-            [1246924800000, 18.3],
-            [1247011200000, 15.4]
-
-        ];		
-		
-		
 		var averages = [];
 		var ranges1 = []; 
 		var ranges = [];
@@ -133,27 +178,61 @@ define(["jquery","./highcharts", "./highcharts-more","text!./simpletable.css"], 
 
 			var d = 0;
 			var browserData = [];
-			console.log(qMatrix)
+			//console.log(qMatrix)
 			for(d = 0; d < qMatrix.length; d++) {
 				var value = qMatrix[d];
-				averages.push( [value[0].qNum, value[1].qNum] );
-				ranges.push( [value[0].qNum, value[2].qNum, value[3].qNum] );
-				ranges1.push( [value[0].qNum, value[4].qNum, value[5].qNum] );
-				//var obj = {};
-				//obj.name = qMatrix[d][0].qText;
-				//obj.y = parseInt(qMatrix[d][1].qText.replace('%', ''));
-				//browserData.push(obj);
+				averages.push( [moment(value[0].qText).valueOf(), value[1].qNum] );
+				
+				if( value[2].qNum != 0 ) {
+					ranges.push( [moment(value[0].qText).valueOf(), value[2].qNum, value[3].qNum] );
+				}
+				
+				if( value[4].qNum != 0 ) {
+					ranges1.push( [moment(value[0].qText).valueOf(), value[4].qNum, value[5].qNum] );
+				}
 			}
-console.log(averages)
-console.log(ranges)
-			$('#'+id).highcharts({
-
+			
+	//console.log(averages)
+	//console.log(ranges)
+	if( !layout.legend.position ) {
+		layout.legend.position = 'right'
+	}	
+	
+	if( !layout.legend.positionVertical ) {
+		layout.legend.positionVertical = 'top'
+	}
+	
+	if( !layout.legend.layout ) {
+		layout.legend.layout = 'vertical'
+	}
+	
+	if( !layout.legend.title ) {
+		layout.legend.title = ''
+	}	
+	
+	$('#'+id).highcharts({
+	  plotOptions: {
+		  series: {
+			  animation: false
+		  }
+	  },
         title: {
-            text: 'July temperatures'
+            text: layout.ChartTitle
         },
-
+        legend: {
+            align: layout.legend.position,
+            verticalAlign: layout.legend.positionVertical,
+            layout: layout.legend.layout,
+			floating: layout.legend.floating,
+            x: 0,
+            y: 0,
+			enabled: layout.legend.show,
+			title: {
+				text: layout.legend.title
+				}
+        },
         xAxis: {
-            type: 'number'
+            type: 'date'
         },
 
         yAxis: {
@@ -161,18 +240,17 @@ console.log(ranges)
                 text: null
             }
         },
-
         tooltip: {
             crosshairs: true,
             shared: true,
-            valueSuffix: '°C'
+            valueSuffix: '',
+			formatter: function() {
+          		return console.log(this.points); //'<b>' + moment(this.value).format("YYYY-MM-DD") + '</b><br/>' + this.y
+				;
+        	}
         },
-
-        legend: {
-        },
-
         series: [{
-            name: 'Temperature',
+            name: 'Week',
             data: averages,
             zIndex: 1,
             marker: {
